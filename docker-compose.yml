@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: bitnami/postgresql
+    container_name: products-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRESQL_USERNAME: products_user
+      POSTGRESQL_PASSWORD: products_pass
+      POSTGRESQL_DATABASE: products_db
+    volumes:
+      - postgres_data:/bitnami/postgresql
+
+volumes:
+  postgres_data:
