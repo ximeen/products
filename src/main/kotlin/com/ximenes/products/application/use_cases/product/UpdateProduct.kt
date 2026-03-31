@@ -3,6 +3,7 @@ package com.ximenes.products.application.use_cases.product
 import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.product.Product
 import com.ximenes.products.domain.entities.product.ProductStatus
+import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
 import com.ximenes.products.shared.errors.NotFoundError
@@ -61,7 +62,7 @@ class UpdateProductUseCase(
             description = input.description,
             sku = input.sku?.let { Sku.create(it) },
             category = input.category,
-            defaultPrice = input.defaultPrice,
+            defaultPrice = input.defaultPrice?.let { Price.create(it) },
             status = input.status
         )
 
@@ -73,7 +74,7 @@ class UpdateProductUseCase(
             description = updatedProduct.description,
             sku = updatedProduct.sku.getValue(),
             category = updatedProduct.category,
-            defaultPrice = updatedProduct.defaultPrice,
+            defaultPrice = updatedProduct.defaultPrice.getValue(),
             status = updatedProduct.status,
             updatedAt = updatedProduct.updatedAt.toString(),
         )

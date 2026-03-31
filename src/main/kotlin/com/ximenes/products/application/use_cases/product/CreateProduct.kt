@@ -4,6 +4,7 @@ import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.product.Product
 import com.ximenes.products.domain.entities.product.ProductProps
 import com.ximenes.products.domain.entities.product.ProductStatus
+import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
 import java.math.BigDecimal
@@ -46,7 +47,7 @@ class CreateProductUseCase(
                 description = input.description,
                 sku = Sku.create(input.sku),
                 category = input.category,
-                defaultPrice = input.defaultPrice,
+                defaultPrice = Price.create(input.defaultPrice),
                 status = ProductStatus.ACTIVE,
             )
         )
@@ -59,7 +60,7 @@ class CreateProductUseCase(
             description = product.description,
             sku = product.sku.getValue(),
             category = product.category,
-            defaultPrice = product.defaultPrice,
+            defaultPrice = product.defaultPrice.getValue(),
             status = product.status,
         )
     }

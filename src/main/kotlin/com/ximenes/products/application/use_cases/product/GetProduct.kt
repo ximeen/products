@@ -31,7 +31,7 @@ class GetProductUseCase(
             description = product.description,
             sku = product.sku.getValue(),
             category = product.category,
-            defaultPrice = product.defaultPrice,
+            defaultPrice = product.defaultPrice.getValue(),
             status = product.status,
             createdAt = product.createdAt.toString(),
             updatedAt = product.updatedAt.toString(),

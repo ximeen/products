@@ -3,6 +3,7 @@ package com.ximenes.products.application.use_cases.product
 import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.product.Product
 import com.ximenes.products.domain.entities.product.ProductStatus
+import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
 import io.mockk.every
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import kotlin.test.assertFailsWith
 
@@ -56,7 +56,7 @@ class CreateProductTest {
                 description = "Caneta",
                 sku = Sku.create("CAN-000"),
                 category = "Papelaria",
-                defaultPrice = BigDecimal("1.00"),
+                defaultPrice = Price.create(BigDecimal("1.00")),
                 status = ProductStatus.ACTIVE
             )
         )
@@ -85,7 +85,7 @@ class CreateProductTest {
                 description = "Caneta",
                 sku = Sku.create("CAN-001"),
                 category = "Papelaria",
-                defaultPrice = BigDecimal("1.00"),
+                defaultPrice = Price.create(BigDecimal("1.00")),
                 status = ProductStatus.ACTIVE
             )
         )

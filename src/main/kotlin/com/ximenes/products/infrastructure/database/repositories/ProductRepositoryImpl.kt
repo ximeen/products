@@ -4,6 +4,7 @@ import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.product.Product
 import com.ximenes.products.domain.entities.product.ProductProps
 import com.ximenes.products.domain.entities.product.ProductStatus
+import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.infrastructure.database.jpa.entities.ProductJpaEntity
 import com.ximenes.products.infrastructure.database.jpa.repositories.ProductJpaRepository
@@ -61,7 +62,7 @@ class ProductRepositoryImpl(
                 description = this.description,
                 sku = Sku.create(this.sku),
                 category = this.category,
-                defaultPrice = this.default_price,
+                defaultPrice = Price.from(this.default_price),
                 status = ProductStatus.valueOf(this.productStatus),
             ),
             id = this.id
@@ -74,7 +75,7 @@ class ProductRepositoryImpl(
             description = this.description,
             sku = this.sku.getValue(),
             category = this.category,
-            default_price = this.defaultPrice,
+            default_price = this.defaultPrice.getValue(),
             productStatus = this.status.name,
             created_at = this.createdAt,
             updated_at = this.updatedAt,

@@ -1,15 +1,15 @@
 package com.ximenes.products.domain.entities.product
 
+import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.domain.shared.Entity
-import java.math.BigDecimal
 
 data class ProductProps(
     val name: String,
     val description: String?,
     val sku: Sku,
     val category: String?,
-    val defaultPrice: BigDecimal,
+    val defaultPrice: Price,
     val status: ProductStatus = ProductStatus.ACTIVE,
 )
 
@@ -22,7 +22,7 @@ class Product private constructor(
     val description: String? get() = props.description
     val sku: Sku get() = props.sku
     val category: String? get() = props.category
-    val defaultPrice: BigDecimal get() = props.defaultPrice
+    val defaultPrice: Price get() = props.defaultPrice
     val status: ProductStatus get() = props.status
 
     fun updateWith(
@@ -30,7 +30,7 @@ class Product private constructor(
         description: String? = null,
         sku: Sku? = null,
         category: String? = null,
-        defaultPrice: BigDecimal? = null,
+        defaultPrice: Price? = null,
         status: ProductStatus? = null
     ): Product {
         val newName = (name ?: this.name).trim()
@@ -45,8 +45,7 @@ class Product private constructor(
         require(newName.length <= 100) { "Nome deve ter no máximo 100 caracteres" }
         require(newDescription == null || newDescription.length <= 500) { "Descrição deve ter no máximo 500 caracteres" }
         require(newCategory == null || newCategory.length <= 50) { "Categoria deve ter no máximo 50 caracteres" }
-        require(newPrice >= BigDecimal.ZERO) { "Preço padrão não pode ser negativo" }
-        require(newPrice > BigDecimal.ZERO) { "Preço padrão deve ser maior que zero" }
+        require(!newPrice.isZeroOrNegative()) { "Preço padrão deve ser maior que zero" }
 
         val newProps = ProductProps(
             name = newName,
@@ -73,8 +72,7 @@ class Product private constructor(
             require(props.name.trim().length <= 100) { "Nome deve ter no máximo 100 caracteres" }
             require(props.description == null || props.description.length <= 500) { "Descrição deve ter no máximo 500 caracteres" }
             require(props.category == null || props.category.length <= 50) { "Categoria deve ter no máximo 50 caracteres" }
-        require(props.defaultPrice >= BigDecimal.ZERO) { "Preço padrão não pode ser negativo" }
-        require(props.defaultPrice > BigDecimal.ZERO) { "Preço padrão deve ser maior que zero" }
+            require(!props.defaultPrice.isZeroOrNegative()) { "Preço padrão deve ser maior que zero" }
             
             return Product(
                 props = props.copy(

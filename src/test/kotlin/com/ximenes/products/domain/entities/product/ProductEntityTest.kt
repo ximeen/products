@@ -1,5 +1,6 @@
 package com.ximenes.products.domain.entities.product
 
+import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -19,7 +20,7 @@ class ProductEntityTest {
             description = "Caneta ponta média 1.0mm",
             sku = Sku.create("CAN-001"),
             category = "Papelaria",
-            defaultPrice = BigDecimal("2.50"),
+            defaultPrice = Price.create(BigDecimal("2.50")),
             status = ProductStatus.ACTIVE,
         )
     }
@@ -73,17 +74,17 @@ class ProductEntityTest {
     @Test
     fun `should throw error if defaultPrice is zero`() {
         val ex = assertFailsWith<IllegalArgumentException> {
-            Product.create(validProps.copy(defaultPrice = BigDecimal.ZERO))
+            Product.create(validProps.copy(defaultPrice = Price.create(BigDecimal.ZERO)))
         }
-        assertEquals("Preço padrão deve ser maior que zero", ex.message)
+        assertEquals("Preço deve ser maior que zero", ex.message)
     }
 
     @Test
     fun `should throw error if defaultPrice is negative`() {
         val ex = assertFailsWith<IllegalArgumentException> {
-            Product.create(validProps.copy(defaultPrice = BigDecimal("-1.00")))
+            Product.create(validProps.copy(defaultPrice = Price.create(BigDecimal("-1.00"))))
         }
-        assertEquals("Preço padrão não pode ser negativo", ex.message)
+        assertEquals("Preço não pode ser negativo", ex.message)
     }
 
     @Test
@@ -91,7 +92,7 @@ class ProductEntityTest {
         val product = Product.create(validProps)
         assertEquals("Caneta Esferográfica Azul", product.name)
         assertEquals("CAN-001", product.sku.getValue())
-        assertEquals(BigDecimal("2.50"), product.defaultPrice)
+        assertEquals(BigDecimal("2.50"), product.defaultPrice.getValue())
     }
 
     @Test

@@ -70,7 +70,7 @@ class ListProductsUseCase(
         description = this.description,
         sku = this.sku.getValue(),
         category = this.category,
-        defaultPrice = this.defaultPrice,
+        defaultPrice = this.defaultPrice.getValue(),
         status = this.status,
     )
 }
