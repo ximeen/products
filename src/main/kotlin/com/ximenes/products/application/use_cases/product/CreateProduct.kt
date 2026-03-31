@@ -7,6 +7,7 @@ import com.ximenes.products.domain.entities.product.ProductStatus
 import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 data class CreateProductInput(
@@ -27,6 +28,7 @@ data class CreateProductOutput(
     val status: ProductStatus,
 )
 
+@Component
 class CreateProductUseCase(
     private val productRepo: IProductRepository
 ) {

@@ -31,12 +31,22 @@ class Product private constructor(
         sku: Sku? = null,
         category: String? = null,
         defaultPrice: Price? = null,
-        status: ProductStatus? = null
+        status: ProductStatus? = null,
+        clearDescription: Boolean = false,
+        clearCategory: Boolean = false
     ): Product {
         val newName = (name ?: this.name).trim()
-        val newDescription = description?.trim() ?: this.description
+        val newDescription = when {
+            clearDescription -> null
+            description != null -> description.trim()
+            else -> this.description
+        }
         val newSku = sku ?: this.sku
-        val newCategory = category?.trim() ?: this.category
+        val newCategory = when {
+            clearCategory -> null
+            category != null -> category.trim()
+            else -> this.category
+        }
         val newPrice = defaultPrice ?: this.defaultPrice
         val newStatus = status ?: this.status
 

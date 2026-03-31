@@ -21,11 +21,9 @@ class SkuTest {
     }
 
     @Test
-    fun `should throw error if sku has invalid format - lowercase`() {
-        val ex = assertFailsWith<IllegalArgumentException> {
-            Sku.create("can-001")
-        }
-        assertEquals("SKU deve seguir o formato ABC-1234 (letras maiúsculas, hífen, números)", ex.message)
+    fun `should normalize lowercase sku to uppercase`() {
+        val sku = Sku.create("can-001")
+        assertEquals("CAN-001", sku.getValue())
     }
 
     @Test

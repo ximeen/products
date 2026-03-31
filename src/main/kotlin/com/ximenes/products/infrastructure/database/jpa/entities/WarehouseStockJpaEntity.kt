@@ -1,5 +1,6 @@
 package com.ximenes.products.infrastructure.database.jpa.entities
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
@@ -11,13 +12,16 @@ data class WarehouseStockJpaEntity(
     @Id
     val id: String,
 
-    val product_id: String,
+    @Column(name = "product_id")
+    val productId: String,
 
-    val warehouse_id: String,
+    @Column(name = "warehouse_id")
+    val warehouseId: String,
 
     val quantity: Int,
 
     val location: String,
 
-    val updated_at: Instant,
+    @Column(name = "updated_at")
+    val updatedAt: Instant,
 )

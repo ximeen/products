@@ -9,9 +9,10 @@ import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.infrastructure.database.jpa.entities.ProductJpaEntity
 import com.ximenes.products.infrastructure.database.jpa.repositories.ProductJpaRepository
 import org.springframework.data.domain.PageRequest
-import org.springframework.stereotype.Component
+import org.springframework.data.domain.Sort
+import org.springframework.stereotype.Repository
 
-@Component
+@Repository
 class ProductRepositoryImpl(
     private val jpaRepository: ProductJpaRepository
 ) : IProductRepository {
@@ -38,7 +39,7 @@ class ProductRepositoryImpl(
         jpaRepository.search(
             category,
             status?.name,
-            PageRequest.of(page, size)
+            PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"))
         ).content.map { it.toDomain() }
 
     override fun update(product: Product) {

@@ -1,5 +1,6 @@
 package com.ximenes.products.infrastructure.database.jpa.entities
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
@@ -17,7 +18,9 @@ data class WarehouseJpaEntity(
 
     val active: Boolean,
 
-    val created_at: Instant,
+    @Column(name = "created_at")
+    val createdAt: Instant,
 
-    val updated_at: Instant,
+    @Column(name = "updated_at")
+    val updatedAt: Instant,
 )

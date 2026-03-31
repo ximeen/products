@@ -4,11 +4,13 @@ import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.product.Product
 import com.ximenes.products.domain.entities.product.ProductStatus
 import com.ximenes.products.shared.errors.ValidationError
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 data class ListProductsInput(
     val category: String? = null,
     val status: ProductStatus? = ProductStatus.ACTIVE,
+    val search: String? = null,
     val page: Int = 0,
     val size: Int = 20,
 )
@@ -31,6 +33,7 @@ data class ProductSummary(
     val status: ProductStatus,
 )
 
+@Component
 class ListProductsUseCase(
     private val productRepo: IProductRepository
 ) {
@@ -40,13 +43,15 @@ class ListProductsUseCase(
         val products = productRepo.findAll(
             category = input.category,
             status = input.status,
+            search = input.search,
             page = input.page,
             size = input.size
         )
 
         val totalElements = productRepo.count(
             category = input.category,
-            status = input.status
+            status = input.status,
+            search = input.search
         )
 
         val totalPages = if (input.size > 0) {

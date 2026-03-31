@@ -21,8 +21,8 @@ Representa um item comercializável no sistema.
 | `category`    | String      | não         | Máx. 50 caracteres                                                     |
 | `defaultPrice`| BigDecimal  | sim         | Maior que zero. Usado quando não há tabela de preço aplicável          |
 | `status`      | Enum        | sim         | `ACTIVE` ou `INACTIVE`. Padrão: `ACTIVE`                              |
-| `createdAt`   | Timestamp   | sim         | Gerado automaticamente                                                 |
-| `updatedAt`   | Timestamp   | sim         | Atualizado automaticamente a cada alteração                            |
+| `createdAt`   | Timestamp   | sim         | Gerado automaticamente. Sempre em UTC                                  |
+| `updatedAt`   | Timestamp   | sim         | Atualizado automaticamente a cada alteração. Sempre em UTC             |
 
 ---
 
@@ -93,16 +93,16 @@ Relaciona produto, depósito, quantidade e localização física dentro do depó
 | Cenário | Resultado |
 |--------|-----------|
 | Dados válidos | Produto criado com `status = ACTIVE`. Retorna `201 Created` com o produto |
-| `name` ausente ou vazio | `400 Bad Request` — "Nome é obrigatório" |
-| `name` com menos de 3 caracteres | `400 Bad Request` — "Nome deve ter no mínimo 3 caracteres" |
-| `name` com mais de 100 caracteres | `400 Bad Request` — "Nome deve ter no máximo 100 caracteres" |
-| `name` já existente no sistema | `409 Conflict` — "Já existe um produto com este nome" |
-| `sku` ausente ou vazio | `400 Bad Request` — "SKU é obrigatório" |
-| `sku` em formato inválido (ex: `abc-123`, `AB123`) | `400 Bad Request` — "SKU deve seguir o formato ABC-1234 (letras maiúsculas, hífen, números)" |
-| `sku` já existente no sistema | `409 Conflict` — "SKU já cadastrado no sistema" |
-| `defaultPrice` ausente | `400 Bad Request` — "Preço padrão é obrigatório" |
-| `defaultPrice` igual a zero | `400 Bad Request` — "Preço padrão deve ser maior que zero" |
-| `defaultPrice` negativo | `400 Bad Request` — "Preço padrão não pode ser negativo" |
+| `name` ausente ou vazio | `400 Bad Request` — `PRODUCT_NAME_REQUIRED` — "Nome é obrigatório" |
+| `name` com menos de 3 caracteres | `400 Bad Request` — `PRODUCT_NAME_TOO_SHORT` — "Nome deve ter no mínimo 3 caracteres" |
+| `name` com mais de 100 caracteres | `400 Bad Request` — `PRODUCT_NAME_TOO_LONG` — "Nome deve ter no máximo 100 caracteres" |
+| `name` já existente no sistema | `409 Conflict` — `PRODUCT_NAME_ALREADY_EXISTS` — "Já existe um produto com este nome" |
+| `sku` ausente ou vazio | `400 Bad Request` — `PRODUCT_SKU_REQUIRED` — "SKU é obrigatório" |
+| `sku` em formato inválido (ex: `abc-123`, `AB123`) | `400 Bad Request` — `PRODUCT_SKU_INVALID_FORMAT` — "SKU deve seguir o formato ABC-1234 (letras maiúsculas, hífen, números)" |
+| `sku` já existente no sistema | `409 Conflict` — `PRODUCT_SKU_ALREADY_EXISTS` — "SKU já cadastrado no sistema" |
+| `defaultPrice` ausente | `400 Bad Request` — `PRODUCT_PRICE_REQUIRED` — "Preço padrão é obrigatório" |
+| `defaultPrice` igual a zero | `400 Bad Request` — `PRODUCT_PRICE_MUST_BE_POSITIVE` — "Preço padrão deve ser maior que zero" |
+| `defaultPrice` negativo | `400 Bad Request` — `PRODUCT_PRICE_NEGATIVE` — "Preço padrão não pode ser negativo" |
 
 ---
 
@@ -112,20 +112,24 @@ Relaciona produto, depósito, quantidade e localização física dentro do depó
 
 **Query params opcionais:**
 
-| Param      | Tipo   | Descrição                              |
-|------------|--------|----------------------------------------|
-| `category` | String | Filtra por categoria (exact match)     |
-| `status`   | Enum   | `ACTIVE` ou `INACTIVE`. Padrão: `ACTIVE` |
-| `page`     | Int    | Página (padrão: 0)                     |
-| `size`     | Int    | Itens por página (padrão: 20, máx: 100)|
+| Param      | Tipo   | Descrição                                                       |
+|------------|--------|-----------------------------------------------------------------|
+| `search`   | String | Busca parcial por nome (case-insensitive). Ex: `?search=caneta` |
+| `category` | String | Filtra por categoria (exact match)                              |
+| `status`   | Enum   | `ACTIVE` ou `INACTIVE`. Padrão: `ACTIVE`                       |
+| `page`     | Int    | Página (padrão: 0)                                              |
+| `size`     | Int    | Itens por página (padrão: 20, máx: 100)                        |
+
+**Ordenação padrão:** `name ASC`
 
 **Comportamentos esperados:**
 
 | Cenário | Resultado |
 |--------|-----------|
-| Requisição válida | `200 OK` com lista paginada de produtos |
+| Requisição válida | `200 OK` com lista paginada de produtos ordenada por `name ASC` |
+| `search=caneta` | Retorna produtos cujo nome contém "caneta" (case-insensitive) |
 | Nenhum produto encontrado | `200 OK` com lista vazia `[]` |
-| `size` acima de 100 | `400 Bad Request` — "Tamanho máximo por página é 100" |
+| `size` acima de 100 | `400 Bad Request` — `INVALID_PAGE_SIZE` — "Tamanho máximo por página é 100" |
 
 ---
 
@@ -161,13 +165,15 @@ Relaciona produto, depósito, quantidade e localização física dentro do depó
 | Cenário | Resultado |
 |--------|-----------|
 | Dados válidos | `200 OK` com produto atualizado. `updatedAt` é renovado |
-| Produto não encontrado | `404 Not Found` — "Produto não encontrado" |
-| `name` alterado para um já existente em outro produto | `409 Conflict` — "Já existe um produto com este nome" |
+| Produto não encontrado | `404 Not Found` — `PRODUCT_NOT_FOUND` — "Produto não encontrado" |
+| `name` alterado para um já existente em outro produto | `409 Conflict` — `PRODUCT_NAME_ALREADY_EXISTS` — "Já existe um produto com este nome" |
 | `name` mantido igual (mesmo produto) | Permitido — não gera conflito |
-| `sku` alterado para um já existente em outro produto | `409 Conflict` — "SKU já cadastrado no sistema" |
+| `sku` alterado para um já existente em outro produto | `409 Conflict` — `PRODUCT_SKU_ALREADY_EXISTS` — "SKU já cadastrado no sistema" |
 | `sku` mantido igual (mesmo produto) | Permitido — não gera conflito |
-| Campo enviado com valor inválido | Mesmos erros `400` do criar |
-| Body vazio `{}` | `400 Bad Request` — "Nenhum campo informado para atualização" |
+| Campo enviado com valor inválido | Mesmos codes e erros `400` do criar |
+| `null` explícito em campo opcional (ex: `{"description": null}`) | Campo é limpo — valor passa a ser nulo no banco |
+| `null` explícito em campo obrigatório (ex: `{"name": null}`) | `400 Bad Request` — mesmo code do campo ausente |
+| Body vazio `{}` | `400 Bad Request` — `EMPTY_UPDATE_BODY` — "Nenhum campo informado para atualização" |
 
 ---
 
@@ -181,9 +187,9 @@ Relaciona produto, depósito, quantidade e localização física dentro do depó
 
 | Cenário | Resultado |
 |--------|-----------|
-| Produto existe | `204 No Content` |
-| Produto não encontrado | `404 Not Found` — "Produto não encontrado" |
-| Produto possui estoque em algum depósito | `409 Conflict` — "Não é possível excluir produto com estoque ativo em depósitos" |
+| Produto existe e sem `quantity > 0` em nenhum depósito | `204 No Content`. Registros de `WarehouseStock` com `quantity = 0` são deletados em cascata |
+| Produto não encontrado | `404 Not Found` — `PRODUCT_NOT_FOUND` — "Produto não encontrado" |
+| Produto possui estoque em algum depósito (`quantity > 0`) | `409 Conflict` — `PRODUCT_HAS_ACTIVE_STOCK` — "Não é possível excluir produto com estoque ativo em depósitos" |
 
 ### 6. Inativar Depósito
 
@@ -247,9 +253,11 @@ O SKU deve obedecer a expressão regular:
 ^[A-Z]{2,10}-[0-9]{1,6}$
 ```
 
+**Normalização:** o sistema converte o SKU para maiúsculas antes de qualquer validação ou comparação. Assim `can-001` é normalizado para `CAN-001` antes de checar o formato — e então rejeitado pois mesmo normalizado o formato pode ser inválido. A unicidade é sempre comparada em maiúsculas.
+
 **Exemplos válidos:** `CAN-001`, `PROD-1234`, `AB-9`, `NOTEBOOK-100`
 
-**Exemplos inválidos:** `can-001` (minúsculas), `AB123` (sem hífen), `A-001` (menos de 2 letras), `MUITASLETRAS123-001` (mais de 10 letras)
+**Exemplos inválidos:** `AB123` (sem hífen), `A-001` (menos de 2 letras), `MUITASLETRAS123-001` (mais de 10 letras)
 
 ---
 
@@ -273,10 +281,13 @@ O SKU deve obedecer a expressão regular:
 ### Erro (response)
 ```json
 {
-  "error": "mensagem de erro",
+  "code": "PRODUCT_SKU_ALREADY_EXISTS",
+  "error": "SKU já cadastrado no sistema",
   "details": ["campo: detalhe adicional"]
 }
 ```
+
+> O campo `code` é um identificador fixo em `SCREAMING_SNAKE_CASE` — o frontend deve usá-lo para tratar erros específicos, nunca fazer parse da string `error`.
 
 ---
 
@@ -299,6 +310,14 @@ O SKU deve obedecer a expressão regular:
 8. **Produtos zerados não bloqueiam:** `quantity = 0` significa que o produto está cadastrado no depósito mas sem unidades físicas — não bloqueia inativação.
 
 9. **Entradas de estoque permanecem após inativação:** Ao inativar um depósito, os registros de `WarehouseStock` com `quantity = 0` **não são deletados**. Eles ficam vinculados ao depósito inativo para fins de auditoria — preservando o histórico de quais produtos já estiveram naquele depósito.
+
+10. **Cascata ao deletar produto:** Ao excluir um produto fisicamente, todos os registros de `WarehouseStock` com `quantity = 0` vinculados a ele são deletados em cascata. Registros com `quantity > 0` bloqueiam a exclusão.
+
+11. **`null` explícito em PATCH limpa campos opcionais:** Enviar `{"description": null}` apaga o valor do campo. Campos obrigatórios rejeitam `null` com o mesmo código de erro do campo ausente.
+
+12. **Todos os timestamps em UTC:** O sistema opera exclusivamente em UTC. Conversão de fuso horário é responsabilidade do cliente.
+
+13. **SKU normalizado para maiúsculas:** O sistema converte o SKU para maiúsculas antes de validar formato e unicidade — comportamento consistente independente do que o cliente enviar.
 
 ---
 
@@ -434,7 +453,7 @@ test(produto): testa endpoint POST /products (integração)
 ## Fora de Escopo (por ora)
 
 - Autenticação e autorização
-- Movimentação de estoque (entrada/saída)
+- Movimentação de estoque (entrada/saída) — coberto pela spec `warehouse_stock.md`
 - Histórico de alterações de preço
 - Gerenciamento de tabelas de preço (CRUD de PriceTable)
-- Gerenciamento de depósitos (CRUD de Warehouse)
+- Gerenciamento de depósitos (CRUD de Warehouse) — coberto pela spec `warehouse.md`

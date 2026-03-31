@@ -4,6 +4,7 @@ import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.product.Product
 import com.ximenes.products.domain.entities.product.ProductStatus
 import com.ximenes.products.shared.errors.NotFoundError
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 data class GetProductOutput(
@@ -18,6 +19,7 @@ data class GetProductOutput(
     val updatedAt: String,
 )
 
+@Component
 class GetProductUseCase(
     private val productRepo: IProductRepository
 ) {

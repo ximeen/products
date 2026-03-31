@@ -8,6 +8,7 @@ import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
 import com.ximenes.products.shared.errors.NotFoundError
 import com.ximenes.products.shared.errors.ValidationError
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 data class UpdateProductInput(
@@ -17,6 +18,8 @@ data class UpdateProductInput(
     val category: String? = null,
     val defaultPrice: BigDecimal? = null,
     val status: ProductStatus? = null,
+    val clearDescription: Boolean = false,
+    val clearCategory: Boolean = false,
 )
 
 data class UpdateProductOutput(
@@ -30,6 +33,7 @@ data class UpdateProductOutput(
     val updatedAt: String,
 )
 
+@Component
 class UpdateProductUseCase(
     private val productRepo: IProductRepository
 ) {
@@ -51,7 +55,8 @@ class UpdateProductUseCase(
         }
 
         input.sku?.let { newSku ->
-            val existingBySku = productRepo.findBySku(newSku)
+            val skuUpper = newSku.uppercase()
+            val existingBySku = productRepo.findBySku(skuUpper)
             if (existingBySku != null && existingBySku.id != id) {
                 throw ConflictError("SKU já cadastrado no sistema")
             }
@@ -63,7 +68,9 @@ class UpdateProductUseCase(
             sku = input.sku?.let { Sku.create(it) },
             category = input.category,
             defaultPrice = input.defaultPrice?.let { Price.create(it) },
-            status = input.status
+            status = input.status,
+            clearDescription = input.clearDescription,
+            clearCategory = input.clearCategory
         )
 
         productRepo.update(updatedProduct)

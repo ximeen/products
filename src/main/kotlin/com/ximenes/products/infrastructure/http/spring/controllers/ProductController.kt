@@ -68,7 +68,7 @@ class ProductController(
     @PatchMapping("/{id}")
     fun update(
         @PathVariable id: String,
-        @RequestBody body: UpdateProductRequest
+        @RequestBody body: Map<String, Any?>
     ): UpdateProductResponse {
         val result = updateProductUseCase.execute(id, body.toInput())
         return UpdateProductResponse.fromOutput(result)
@@ -225,4 +225,17 @@ data class UpdateProductResponse(
             updatedAt = output.updatedAt
         )
     }
+}
+
+fun Map<String, Any?>.toInput(): UpdateProductInput {
+    return UpdateProductInput(
+        name = this["name"] as? String,
+        description = this["description"] as? String,
+        sku = this["sku"] as? String,
+        category = this["category"] as? String,
+        defaultPrice = (this["defaultPrice"] as? Double)?.let { java.math.BigDecimal.valueOf(it) },
+        status = (this["status"] as? String)?.let { com.ximenes.products.domain.entities.product.ProductStatus.valueOf(it) },
+        clearDescription = containsKey("description") && this["description"] == null,
+        clearCategory = containsKey("category") && this["category"] == null
+    )
 }

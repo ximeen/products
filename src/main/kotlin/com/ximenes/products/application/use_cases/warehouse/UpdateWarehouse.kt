@@ -1,18 +1,15 @@
 package com.ximenes.products.application.use_cases.warehouse
 
-import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.warehouse.IWarehouseRepository
 import com.ximenes.products.domain.entities.warehouse.Warehouse
-import com.ximenes.products.domain.entities.warehouse_stock.IWarehouseStockRepository
-import com.ximenes.products.domain.entities.warehouse_stock.WarehouseStock
-import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.domain.entities.warehouse.WarehouseProps
 import com.ximenes.products.shared.errors.NotFoundError
 import com.ximenes.products.shared.errors.ValidationError
+import org.springframework.stereotype.Component
 
 data class UpdateWarehouseInput(
     val name: String? = null,
     val address: String? = null,
-    val active: Boolean? = null,
 )
 
 data class UpdateWarehouseOutput(
@@ -22,66 +19,38 @@ data class UpdateWarehouseOutput(
     val active: Boolean,
 )
 
-data class ProductWithStock(
-    val productId: String,
-    val productName: String,
-    val sku: String,
-    val quantity: Int,
-    val location: String,
-)
-
-data class WarehouseConflictDetails(
-    val warehouseId: String,
-    val warehouseName: String,
-    val productsWithStock: List<ProductWithStock>,
-)
-
+@Component
 class UpdateWarehouseUseCase(
-    private val warehouseRepo: IWarehouseRepository,
-    private val stockRepo: IWarehouseStockRepository,
-    private val productRepo: IProductRepository
+    private val warehouseRepo: IWarehouseRepository
 ) {
     fun execute(id: String, input: UpdateWarehouseInput): UpdateWarehouseOutput {
-        if (input.name == null && input.address == null && input.active == null) {
+        if (input.name == null && input.address == null) {
             throw ValidationError("Nenhum campo informado para atualização")
         }
 
         val warehouse = warehouseRepo.findById(id)
             ?: throw NotFoundError("Depósito", id)
 
-        if (input.active == false && warehouse.active) {
-            val stocksWithQuantity = stockRepo.findByWarehouseIdWithPositiveQuantity(id)
-            
-            if (stocksWithQuantity.isNotEmpty()) {
-                val productsWithStock = stocksWithQuantity.mapNotNull { stock ->
-                    val product = productRepo.findById(stock.productId)
-                    product?.let {
-                        ProductWithStock(
-                            productId = it.id,
-                            productName = it.name,
-                            sku = it.sku.getValue(),
-                            quantity = stock.quantity,
-                            location = stock.location,
-                        )
-                    }
-                }
-
-                throw ConflictError(
-                    "Estoques não podem ser inativados quando há produtos nele, defina um lugar para esses produtos",
-                    details = WarehouseConflictDetails(
-                        warehouseId = warehouse.id,
-                        warehouseName = warehouse.name,
-                        productsWithStock = productsWithStock,
-                    )
-                )
+        if (input.name != null) {
+            val existingWithName = warehouseRepo.findByName(input.name.trim())
+            if (existingWithName != null && existingWithName.id != id) {
+                throw com.ximenes.products.shared.errors.ConflictError("Já existe um depósito com este nome")
             }
         }
 
-        val updatedWarehouse = warehouse.updateWith(
-            name = input.name,
-            address = input.address,
-            active = input.active
-        )
+        val newName = input.name?.trim() ?: warehouse.name
+        val newAddress = input.address?.trim() ?: warehouse.address
+
+        val updatedWarehouse = Warehouse.create(
+            WarehouseProps(
+                name = newName,
+                address = newAddress,
+                active = warehouse.active,
+            ),
+            id = warehouse.id
+        ).also {
+            it.assignCreatedAt(warehouse.createdAt)
+        }
 
         warehouseRepo.update(updatedWarehouse)
 

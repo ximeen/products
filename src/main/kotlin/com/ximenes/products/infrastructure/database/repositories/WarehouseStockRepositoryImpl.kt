@@ -6,8 +6,9 @@ import com.ximenes.products.domain.entities.warehouse_stock.WarehouseStockProps
 import com.ximenes.products.infrastructure.database.jpa.entities.WarehouseStockJpaEntity
 import com.ximenes.products.infrastructure.database.jpa.repositories.WarehouseStockJpaRepository
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 
-@Component
+@Repository
 class WarehouseStockRepositoryImpl(
     private val jpaRepository: WarehouseStockJpaRepository
 ) : IWarehouseStockRepository {
@@ -58,23 +59,23 @@ class WarehouseStockRepositoryImpl(
     private fun WarehouseStockJpaEntity.toDomain(): WarehouseStock =
         WarehouseStock.create(
             WarehouseStockProps(
-                productId = this.product_id,
-                warehouseId = this.warehouse_id,
+                productId = this.productId,
+                warehouseId = this.warehouseId,
                 quantity = this.quantity,
                 location = this.location,
             ),
             id = this.id
         ).also {
-            it.assignUpdatedAt(this.updated_at)
+            it.assignUpdatedAt(this.updatedAt)
         }
 
     private fun WarehouseStock.toJpaEntity(): WarehouseStockJpaEntity =
         WarehouseStockJpaEntity(
             id = this.id,
-            product_id = this.productId,
-            warehouse_id = this.warehouseId,
+            productId = this.productId,
+            warehouseId = this.warehouseId,
             quantity = this.quantity,
             location = this.location,
-            updated_at = this.updatedAt,
+            updatedAt = this.updatedAt,
         )
 }

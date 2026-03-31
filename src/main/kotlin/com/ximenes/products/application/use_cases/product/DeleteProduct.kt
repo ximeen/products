@@ -4,7 +4,9 @@ import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.warehouse_stock.IWarehouseStockRepository
 import com.ximenes.products.shared.errors.ConflictError
 import com.ximenes.products.shared.errors.NotFoundError
+import org.springframework.stereotype.Component
 
+@Component
 class DeleteProductUseCase(
     private val productRepo: IProductRepository,
     private val stockRepo: IWarehouseStockRepository
@@ -17,6 +19,8 @@ class DeleteProductUseCase(
         if (hasStock) {
             throw ConflictError("Não é possível excluir produto com estoque ativo em depósitos")
         }
+
+        stockRepo.deleteByProductId(id)
 
         productRepo.delete(id)
     }
