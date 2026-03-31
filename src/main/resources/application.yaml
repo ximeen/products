@@ -6,3 +6,16 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# Configuração de timezone: todos os timestamps são UTC
+# O cliente é responsável pela conversão de timezone
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} UTC %msg%n"
