@@ -3,6 +3,7 @@ package com.ximenes.products.application.use_cases.product
 import com.ximenes.products.domain.entities.product.IProductRepository
 import com.ximenes.products.domain.entities.warehouse_stock.IWarehouseStockRepository
 import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.shared.errors.ErrorCodes
 import com.ximenes.products.shared.errors.NotFoundError
 import org.springframework.stereotype.Component
 
@@ -17,7 +18,7 @@ class DeleteProductUseCase(
 
         val hasStock = stockRepo.existsByProductIdWithPositiveQuantity(id)
         if (hasStock) {
-            throw ConflictError("Não é possível excluir produto com estoque ativo em depósitos")
+            throw ConflictError("Não é possível excluir produto com estoque ativo em depósitos", code = ErrorCodes.PRODUCT_HAS_STOCK)
         }
 
         stockRepo.deleteByProductId(id)

@@ -14,18 +14,22 @@ interface ProductJpaRepository : JpaRepository<ProductJpaEntity, String> {
     
     @Query("SELECT p FROM ProductJpaEntity p WHERE " +
            "(:category IS NULL OR p.category = :category) AND " +
-           "(:status IS NULL OR p.productStatus = :status)")
+           "(:status IS NULL OR p.productStatus = :status) AND " +
+           "(:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))")
     fun search(
         @Param("category") category: String?,
         @Param("status") status: String?,
+        @Param("search") search: String?,
         pageable: Pageable
     ): Page<ProductJpaEntity>
     
     @Query("SELECT COUNT(p) FROM ProductJpaEntity p WHERE " +
            "(:category IS NULL OR p.category = :category) AND " +
-           "(:status IS NULL OR p.productStatus = :status)")
+           "(:status IS NULL OR p.productStatus = :status) AND " +
+           "(:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))")
     fun countSearch(
         @Param("category") category: String?,
-        @Param("status") status: String?
+        @Param("status") status: String?,
+        @Param("search") search: String?
     ): Long
 }

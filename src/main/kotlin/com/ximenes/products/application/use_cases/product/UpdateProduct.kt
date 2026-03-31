@@ -6,6 +6,7 @@ import com.ximenes.products.domain.entities.product.ProductStatus
 import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.shared.errors.ErrorCodes
 import com.ximenes.products.shared.errors.NotFoundError
 import com.ximenes.products.shared.errors.ValidationError
 import org.springframework.stereotype.Component
@@ -50,7 +51,7 @@ class UpdateProductUseCase(
         input.name?.let { newName ->
             val existingByName = productRepo.findByName(newName)
             if (existingByName != null && existingByName.id != id) {
-                throw ConflictError("Já existe um produto com este nome")
+                throw ConflictError("Já existe um produto com este nome", code = ErrorCodes.PRODUCT_NAME_ALREADY_EXISTS)
             }
         }
 
@@ -58,7 +59,7 @@ class UpdateProductUseCase(
             val skuUpper = newSku.uppercase()
             val existingBySku = productRepo.findBySku(skuUpper)
             if (existingBySku != null && existingBySku.id != id) {
-                throw ConflictError("SKU já cadastrado no sistema")
+                throw ConflictError("SKU já cadastrado no sistema", code = ErrorCodes.PRODUCT_SKU_ALREADY_EXISTS)
             }
         }
 

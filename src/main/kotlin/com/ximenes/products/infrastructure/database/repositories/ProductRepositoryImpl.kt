@@ -33,12 +33,14 @@ class ProductRepositoryImpl(
     override fun findAll(
         category: String?,
         status: ProductStatus?,
+        search: String?,
         page: Int,
         size: Int
     ): List<Product> =
         jpaRepository.search(
             category,
             status?.name,
+            search,
             PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"))
         ).content.map { it.toDomain() }
 
@@ -53,8 +55,8 @@ class ProductRepositoryImpl(
     override fun exists(id: String): Boolean =
         jpaRepository.existsById(id)
 
-    override fun count(category: String?, status: ProductStatus?): Long =
-        jpaRepository.countSearch(category, status?.name)
+    override fun count(category: String?, status: ProductStatus?, search: String?): Long =
+        jpaRepository.countSearch(category, status?.name, search)
 
     private fun ProductJpaEntity.toDomain(): Product =
         Product.create(

@@ -52,12 +52,14 @@ class ProductController(
     fun list(
         @RequestParam category: String? = null,
         @RequestParam status: String? = null,
+        @RequestParam search: String? = null,
         @RequestParam(defaultValue = "0") @Min(0) page: Int = 0,
         @RequestParam(defaultValue = "20") @Min(1) @Max(100) size: Int = 20
     ): ListProductsResponse {
         val input = ListProductsInput(
             category = category,
             status = status?.let { ProductStatus.valueOf(it) },
+            search = search,
             page = page,
             size = size
         )

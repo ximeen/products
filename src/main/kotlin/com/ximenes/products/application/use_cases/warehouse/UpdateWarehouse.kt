@@ -3,6 +3,8 @@ package com.ximenes.products.application.use_cases.warehouse
 import com.ximenes.products.domain.entities.warehouse.IWarehouseRepository
 import com.ximenes.products.domain.entities.warehouse.Warehouse
 import com.ximenes.products.domain.entities.warehouse.WarehouseProps
+import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.shared.errors.ErrorCodes
 import com.ximenes.products.shared.errors.NotFoundError
 import com.ximenes.products.shared.errors.ValidationError
 import org.springframework.stereotype.Component
@@ -34,7 +36,7 @@ class UpdateWarehouseUseCase(
         if (input.name != null) {
             val existingWithName = warehouseRepo.findByName(input.name.trim())
             if (existingWithName != null && existingWithName.id != id) {
-                throw com.ximenes.products.shared.errors.ConflictError("Já existe um depósito com este nome")
+                throw ConflictError("Já existe um depósito com este nome", code = ErrorCodes.WAREHOUSE_NAME_ALREADY_EXISTS)
             }
         }
 

@@ -4,6 +4,7 @@ import com.ximenes.products.domain.entities.warehouse.IWarehouseRepository
 import com.ximenes.products.domain.entities.warehouse.Warehouse
 import com.ximenes.products.domain.entities.warehouse.WarehouseProps
 import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.shared.errors.ErrorCodes
 import org.springframework.stereotype.Component
 
 data class CreateWarehouseInput(
@@ -25,7 +26,7 @@ class CreateWarehouseUseCase(
     fun execute(input: CreateWarehouseInput): CreateWarehouseOutput {
         val existingByName = warehouseRepo.findByName(input.name.trim())
         if (existingByName != null) {
-            throw ConflictError("Já existe um depósito com este nome")
+            throw ConflictError("Já existe um depósito com este nome", code = ErrorCodes.WAREHOUSE_NAME_ALREADY_EXISTS)
         }
 
         val warehouse = Warehouse.create(

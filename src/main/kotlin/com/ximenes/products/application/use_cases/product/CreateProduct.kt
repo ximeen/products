@@ -7,6 +7,7 @@ import com.ximenes.products.domain.entities.product.ProductStatus
 import com.ximenes.products.domain.entities.product.value_objects.Price
 import com.ximenes.products.domain.entities.product.value_objects.Sku
 import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.shared.errors.ErrorCodes
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
@@ -35,12 +36,12 @@ class CreateProductUseCase(
     fun execute(input: CreateProductInput): CreateProductOutput {
         val existingByName = productRepo.findByName(input.name)
         if (existingByName != null) {
-            throw ConflictError("Já existe um produto com este nome")
+            throw ConflictError("Já existe um produto com este nome", code = ErrorCodes.PRODUCT_NAME_ALREADY_EXISTS)
         }
 
-        val existingBySku = productRepo.findBySku(input.sku)
+        val existingBySku = productRepo.findBySku(input.sku.uppercase())
         if (existingBySku != null) {
-            throw ConflictError("SKU já cadastrado no sistema")
+            throw ConflictError("SKU já cadastrado no sistema", code = ErrorCodes.PRODUCT_SKU_ALREADY_EXISTS)
         }
 
         val product = Product.create(

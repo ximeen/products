@@ -13,21 +13,21 @@ class GlobalExceptionHandler {
     fun handleDomainError(ex: BaseError): ResponseEntity<ErrorResponse> =
         ResponseEntity
             .status(ex.statusCode)
-            .body(ErrorResponse(error = ex.message ?: "Erro interno", details = ex.details))
+            .body(ErrorResponse(code = ex.code, error = ex.message ?: "Erro interno", details = ex.details))
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
         val details = ex.bindingResult.fieldErrors.map { "${it.field}: ${it.defaultMessage}" }
         return ResponseEntity
             .status(400)
-            .body(ErrorResponse(error = "Erro de validação", details = details))
+            .body(ErrorResponse(code = "VALIDATION_ERROR", error = "Erro de validação", details = details))
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> =
         ResponseEntity
             .status(400)
-            .body(ErrorResponse(error = ex.message ?: "Erro de validação"))
+            .body(ErrorResponse(code = "VALIDATION_ERROR", error = ex.message ?: "Erro de validação"))
 }
 
-data class ErrorResponse(val error: String, val details: Any? = null)
+data class ErrorResponse(val code: String, val error: String, val details: Any? = null)

@@ -5,6 +5,7 @@ import com.ximenes.products.domain.entities.warehouse.IWarehouseRepository
 import com.ximenes.products.domain.entities.warehouse.Warehouse
 import com.ximenes.products.domain.entities.warehouse_stock.IWarehouseStockRepository
 import com.ximenes.products.shared.errors.ConflictError
+import com.ximenes.products.shared.errors.ErrorCodes
 import com.ximenes.products.shared.errors.NotFoundError
 import org.springframework.stereotype.Component
 
@@ -62,6 +63,7 @@ class ChangeWarehouseStatusUseCase(
 
                 throw ConflictError(
                     "Estoques não podem ser inativados quando há produtos nele, defina um lugar para esses produtos",
+                    code = ErrorCodes.WAREHOUSE_HAS_STOCK,
                     details = WarehouseConflictDetails(
                         warehouseId = warehouse.id,
                         warehouseName = warehouse.name,
